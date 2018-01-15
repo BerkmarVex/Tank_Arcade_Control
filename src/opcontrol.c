@@ -70,7 +70,7 @@ void checkPressed(){
 	*  this function switches tank and arcade controls          *
 	*  this if statments take in 3 booleans                     *
 	*  if the button was pressed for an extended amount of time *
-	*	 if the button was pressed                                *
+	*  if the button was pressed                                *
 	*  and the current drive style                              *
 	*************************************************************/
 	buttonStatus();
@@ -83,11 +83,11 @@ void checkPressed(){
 }
 
 void module(){
-	/********************************************************
-  *  This function zones the controller to have a slower  *
-	*  inner ring to allow for more precise controll and    *
-	*	 a faster outer ring for faster movment               *
-  *********************************************************/
+/********************************************************
+*  This function zones the controller to have a slower  *
+*  inner ring to allow for more precise controll and    *
+*  a faster outer ring for faster movment               *
+*********************************************************/
 	if((rightJoy >=90 && rightJoy <= 120) || (rightJoy>=-90 && rightJoy<=-120)) {
     rightJoy = rightJoy/2;
   }
@@ -103,10 +103,10 @@ void module(){
 
 
 void tank(){
-	/**********************************************************
-	  This function splits the controls for the               *
-		left and right motors to the left and right joy sticks  *
-	***********************************************************/
+	/***********************************************************
+	*  This function splits the controls for the               *
+	*  left and right motors to the left and right joy sticks  *
+	************************************************************/
 	update();
 	motorSet(rightMotor, rightJoy);
 	motorSet(leftMotor, leftJoyV);
