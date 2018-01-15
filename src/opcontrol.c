@@ -1,59 +1,112 @@
+/************
+*  imports  *
+*************/
 #include "main.h"
 
-int JoystickGetAnalog(unsigned char Joystick, unsigned char axis);
-bool JoystickGetDigital(unsigned char Joystick, unsigned char buttonGroup, unsigned char button);
-void motorSet(unsigned char channel, int speed);
+/*************************
+*  local initialization  *
+**************************/
+
+//Controller variables
 
 int leftJoyV;
 int leftJoyH;
 int rightJoy;
 bool rightR = false;
 bool rightRcheck;
+bool stillPressed = false;
+bool prevRightRcheck = false;
 
-void module(){
-	if ((rightJoy >=90 && rightJoy <= 120) || (rightJoy>=-90 && rightJoy<=-120)) {
-      // divide number between 90 and 120, -90 and -120, to make the controls more precise
-    if (rightJoy%2 == 1 || rightJoy%2 == -1) { //make power variable even so it can be divided by 2
-    	rightJoy++;
-    }
-    rightJoy = rightJoy/2;
-  }
-  if ((leftJoyV >=-90 && leftJoyV <= -120) || (leftJoyV >=90 && leftJoyV <= 120)) {
-    	// divide number between 90 and 120, -90 and -120, to make the controls more precise
-    if (leftJoyV%2 == 1 || leftJoyV%2 == -1){ // make power2 variable even so it can be divided by 2
-      leftJoyV++;
-    }
-	}
-  	leftJoyV = leftJoyV/2;
-	if ((leftJoyH >=-90 && leftJoyH <= -120) || (leftJoyH >=90 && leftJoyH <= 120)) {
-	    	// divide number between 90 and 120, -90 and -120, to make the controls more precise
-	   if (leftJoyH%2 == 1 || leftJoyH%2 == -1){ // make power2 variable even so it can be divided by 2
-	   	leftJoyH++;
-	   }
-	  	leftJoyH = leftJoyH/2;
-  }
-	return;
-}
+//Motor variables
 
-void checkPressed(){
-	if (rightRcheck && rightR){
-		rightR = false;
-	}
-	 else if (rightRcheck && !rightR) {
-		rightR = true;
-	}
-}
+int LeftMotor = 2;
+int rightMotor = 3;
+
+//Function definition
+
+void module();
+void checkPressed();
+void update();
+void tank();
+void arcade();
+
+/************************
+*  function definition  *
+*************************/
 
 void update(){
+	/**********************************************************************
+	*  this function just updates the varables that get used every cylce  *
+	***********************************************************************/
 	leftJoyV = joystickGetAnalog(1, 2);
-	leftJoyH =
+	leftJoyH = /*NEED TO ADD VALUE*/
 	rightJoy = joystickGetAnalog(1,3);
 	rightRcheck = joystickGetDigital(1,8,JOY_RIGHT);
 	module();
 	checkPressed();
 }
 
+void buttonStatus(){
+	/************************************************************
+	*  This function is used to ensure that the varable rightR  *
+	*  does not get changed if the user holds down the switch   *
+	*  button for more than 20 milliseconds                     *
+ 	*************************************************************/
+	if(rightRcheck == true){
+		if(rightRcheck == !prevRightRcheck){
+			stillPressed = false;
+		}
+		else{
+			stillPressed = true;
+		}
+	}
+	else if(rightRcheck == false){
+		stillPressed = false;
+	}
+}
+
+void checkPressed(){
+	/************************************************************
+	*  this function switches tank and arcade controls          *
+	*  this if statments take in 3 booleans                     *
+	*  if the button waspressed for an extended amount of time  *
+	*	 if the button was pressed                                *
+	*  and the current drive style                              *
+	*************************************************************/
+	buttonStatus();
+	if (!stillPressed && rightRcheck && rightR){
+		rightR = false;
+	}
+	else if (!stillPressed && rightRcheck && !rightR) {
+		rightR = true;
+	}
+}
+
+void module(){
+	/********************************************************
+  *  This function zones the controller to have a slower  *
+	*  inner ring to allow for more precise controll and    *
+	*	 a faster outer ring for faster movment               *
+  *********************************************************/
+	if((rightJoy >=90 && rightJoy <= 120) || (rightJoy>=-90 && rightJoy<=-120)) {
+    rightJoy = rightJoy/2;
+  }
+
+  else if((leftJoyV >=-90 && leftJoyV <= -120) || (leftJoyV >=90 && leftJoyV <= 120)) {
+		leftJoyV = leftJoyV/2;
+  }
+
+	else if((leftJoyH >=-90 && leftJoyH <= -120) || (leftJoyH >=90 && leftJoyH <= 120)) {
+	  	leftJoyH = leftJoyH/2;
+  }
+}
+
+
 void tank(){
+	/**********************************************************
+	  This function splits the controls for the               *
+		left and right motors to the left and right joy sticks  *
+	***********************************************************/
 	update();
 	motorSet(2, rightJoy);
 	motorSet(3, leftJoyV);
@@ -61,13 +114,20 @@ void tank(){
 }
 
 void arcade(){
+	/*****************************************
+	*  This functions combines left and      *
+	*  right motor control to one joy stick  *
+	******************************************/
 	update();
 	motorSet(2, leftJoyV - leftJoyH);
 	motorSet(2, leftJoyV - leftJoyH);
 }
 
-
 void operatorControl() {
+	/******************
+	*  main function  *
+	*******************/
+	
 	while (1) {
 		if (!rightR){
 			tank();
