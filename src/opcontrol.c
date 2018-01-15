@@ -19,8 +19,8 @@ bool prevRightRcheck = false;
 
 //Motor variables
 
-int LeftMotor = 2;
-int rightMotor = 3;
+int leftMotor = 3;
+int rightMotor = 2;
 
 //Function definition
 
@@ -38,10 +38,10 @@ void update(){
 	/**********************************************************************
 	*  this function just updates the varables that get used every cylce  *
 	***********************************************************************/
-	leftJoyV = joystickGetAnalog(1, 2);
-	leftJoyH = /*NEED TO ADD VALUE*/
-	rightJoy = joystickGetAnalog(1,3);
-	rightRcheck = joystickGetDigital(1,8,JOY_RIGHT);
+	leftJoyV = joystickGetAnalog(1, 3);
+	leftJoyH = joystickGetAnalog(1, 4);
+	rightJoy = joystickGetAnalog(1, 2);
+	rightRcheck = joystickGetDigital(1, 8, JOY_RIGHT);
 	module();
 	checkPressed();
 }
@@ -69,7 +69,7 @@ void checkPressed(){
 	/************************************************************
 	*  this function switches tank and arcade controls          *
 	*  this if statments take in 3 booleans                     *
-	*  if the button waspressed for an extended amount of time  *
+	*  if the button was pressed for an extended amount of time *
 	*	 if the button was pressed                                *
 	*  and the current drive style                              *
 	*************************************************************/
@@ -108,8 +108,8 @@ void tank(){
 		left and right motors to the left and right joy sticks  *
 	***********************************************************/
 	update();
-	motorSet(2, rightJoy);
-	motorSet(3, leftJoyV);
+	motorSet(rightMotor, rightJoy);
+	motorSet(leftMotor, leftJoyV);
 
 }
 
@@ -119,15 +119,15 @@ void arcade(){
 	*  right motor control to one joy stick  *
 	******************************************/
 	update();
-	motorSet(2, leftJoyV - leftJoyH);
-	motorSet(2, leftJoyV - leftJoyH);
+	motorSet(rightMotor, leftJoyV - leftJoyH);
+	motorSet(leftMotor, leftJoyV - leftJoyH);
 }
 
 void operatorControl() {
 	/******************
 	*  main function  *
 	*******************/
-	
+
 	while (1) {
 		if (!rightR){
 			tank();
